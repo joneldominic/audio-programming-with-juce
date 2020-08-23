@@ -10,15 +10,19 @@
 
 #include "MainWindow.h"
 
-MainWindow::MainWindow(juce::String name) : DocumentWindow(
+MainWindow::MainWindow(juce::String name, juce::Component* component) : DocumentWindow(
 	name,
 	juce::Colours::lightgrey,
 	DocumentWindow::minimiseButton | DocumentWindow::closeButton)
 {
 	setUsingNativeTitleBar(true);
+
+	setContentOwned(component, true);
+
 	setResizable(true, false);
 	setResizeLimits(300, 250, 10000, 10000);
-	centreWithSize(500, 500);
+	centreWithSize(getWidth(), getHeight());
+
 	setVisible(true);
 }
 

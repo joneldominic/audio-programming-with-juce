@@ -15,7 +15,7 @@
 class MainWindow : public juce::DocumentWindow
 {
 public:
-	MainWindow(juce::String name);
+	MainWindow(juce::String name, juce::Component* component);
 	
 	void closeButtonPressed() override;
 

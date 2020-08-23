@@ -15,14 +15,19 @@
 //==============================================================================
 /*
 */
-class MainContentComponent  : public juce::Component
+class MainContentComponent  
+	:	public juce::AudioAppComponent,
+		public juce::ChangeListener
 {
 public:
 	MainContentComponent();
 	~MainContentComponent() override;
 
-	void paint (juce::Graphics&) override;
+	void prepareToPlay(int samplesPerBlockExpected, double sampleRate) override;
+	void getNextAudioBlock(const juce::AudioSourceChannelInfo& bufferToFill) override;
+	void releaseResources() override;
 	void resized() override;
+	void changeListenerCallback(juce::ChangeBroadcaster* source) override;
 
 private:
 	enum TransportState
