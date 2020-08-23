@@ -16,7 +16,8 @@ MainWindow::MainWindow(juce::String name) : DocumentWindow(
 	DocumentWindow::minimiseButton | DocumentWindow::closeButton)
 {
 	setUsingNativeTitleBar(true);
-	setResizable(false, false);
+	setResizable(true, false);
+	setResizeLimits(300, 250, 10000, 10000);
 	centreWithSize(500, 500);
 	setVisible(true);
 }
