@@ -26,6 +26,7 @@ public:
 	void prepareToPlay(int samplesPerBlockExpected, double sampleRate) override;
 	void getNextAudioBlock(const juce::AudioSourceChannelInfo& bufferToFill) override;
 	void releaseResources() override;
+	void paint(juce::Graphics& g) override;
 	void resized() override;
 	void changeListenerCallback(juce::ChangeBroadcaster* source) override;
 
@@ -39,6 +40,10 @@ private:
 	};
 	
 	void changeState(TransportState newState);
+	void transportSourceChanged();
+	void thumbnailChanged();
+	void paintIfNoFileLoaded(juce::Graphics& g, const juce::Rectangle<int>& thumbnailBounds);
+	void paintIfFileLoaded(juce::Graphics& g, const juce::Rectangle<int>& thumbnailBounds);
 	void openButtonClicked();
 	void playButtonClicked();
 	void stopButtonClicked();
@@ -52,6 +57,8 @@ private:
 	std::unique_ptr<juce::AudioFormatReaderSource> readerSource;
 	juce::AudioTransportSource transportSource;
 	TransportState state;
+	juce::AudioThumbnailCache thumbnailCache;                  
+	juce::AudioThumbnail thumbnail;                            
 
 	JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (MainContentComponent)
 };
