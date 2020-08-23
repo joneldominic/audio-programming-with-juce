@@ -1,9 +1,9 @@
 /*
   ==============================================================================
 
-    MainContentComponent.cpp
-    Created: 23 Aug 2020 2:17:22pm
-    Author:  dominic
+	MainContentComponent.cpp
+	Created: 23 Aug 2020 2:17:22pm
+	Author:  dominic
 
   ==============================================================================
 */
@@ -13,39 +13,135 @@
 
 //==============================================================================
 MainContentComponent::MainContentComponent()
+	:	state(Stopped)
 {
-    // In your constructor, you should add any child components, and
-    // initialise any special settings that your component needs.
+	addAndMakeVisible(&openButton);
+	openButton.setButtonText("Open Audio File");
+	openButton.onClick = [this] { openButtonClicked(); };
 
+	addAndMakeVisible(&playButton);
+	playButton.setButtonText("Play");
+	playButton.onClick = [this] { playButtonClicked(); };
+	playButton.setColour(juce::TextButton::buttonColourId, juce::Colours::green);
+	playButton.setEnabled(false);
+
+	addAndMakeVisible(&stopButton);
+	stopButton.setButtonText("Stop");
+	stopButton.onClick = [this] { stopButtonClicked(); };
+	stopButton.setColour(juce::TextButton::buttonColourId, juce::Colours::red);
+	stopButton.setEnabled(false);
+
+	setSize(400, 200);
+
+	formatManager.registerBasicFormats();      
+	transportSource.addChangeListener(this);   
+
+	setAudioChannels(0, 2);
 }
 
 MainContentComponent::~MainContentComponent()
 {
+	shutdownAudio();
 }
 
-void MainContentComponent::paint (juce::Graphics& g)
+void MainContentComponent::prepareToPlay(int samplesPerBlockExpected, double sampleRate) 
 {
-    /* This demo code just fills the component's background and
-       draws some placeholder text to get you started.
+	transportSource.prepareToPlay(samplesPerBlockExpected, sampleRate);
+}
 
-       You should replace everything in this method with your own
-       drawing code..
-    */
+void MainContentComponent::getNextAudioBlock(const juce::AudioSourceChannelInfo& bufferToFill)
+{
+	if (readerSource.get() == nullptr)
+	{
+		bufferToFill.clearActiveBufferRegion();
+		return;
+	}
 
-    g.fillAll (getLookAndFeel().findColour (juce::ResizableWindow::backgroundColourId));   // clear the background
+	transportSource.getNextAudioBlock(bufferToFill);
+}
 
-    g.setColour (juce::Colours::grey);
-    g.drawRect (getLocalBounds(), 1);   // draw an outline around the component
-
-    g.setColour (juce::Colours::white);
-    g.setFont (14.0f);
-    g.drawText ("MainContentComponent", getLocalBounds(),
-                juce::Justification::centred, true);   // draw some placeholder text
+void MainContentComponent::releaseResources()
+{
+	transportSource.releaseResources();
 }
 
 void MainContentComponent::resized()
 {
-    // This method is where you should set the bounds of any child
-    // components that your component contains..
+	openButton.setBounds(10, 10, getWidth() - 20, 20);
+	playButton.setBounds(10, 40, getWidth() - 20, 20);
+	stopButton.setBounds(10, 70, getWidth() - 20, 20);
+}
 
+void MainContentComponent::changeListenerCallback(juce::ChangeBroadcaster* source)
+{
+	if (source == &transportSource)
+	{
+		if (transportSource.isPlaying())
+			changeState(Playing);
+		else
+			changeState(Stopped);
+	}
+}
+
+//==============================================================================
+void MainContentComponent::changeState(TransportState newState)
+{
+	if (state != newState)
+	{
+		state = newState;
+
+		switch (state)
+		{
+		case Stopped:                           
+			stopButton.setEnabled(false);
+			playButton.setEnabled(true);
+			transportSource.setPosition(0.0);
+			break;
+
+		case Starting:                          
+			playButton.setEnabled(false);
+			transportSource.start();
+			break;
+
+		case Playing:                          
+			stopButton.setEnabled(true);
+			break;
+
+		case Stopping:                          
+			transportSource.stop();
+			break;
+		}
+	}
+}
+
+void MainContentComponent::openButtonClicked()
+{
+	juce::FileChooser chooser("Select a Wave file to play...",
+		{},
+		"*.wav;*.mp3");                                        
+
+	if (chooser.browseForFileToOpen())                                         
+	{
+		auto file = chooser.getResult();                                       
+		auto* reader = formatManager.createReaderFor(file);                    
+
+		if (reader != nullptr)
+		{
+			std::unique_ptr<juce::AudioFormatReaderSource> newSource(new juce::AudioFormatReaderSource(reader, true)); 
+			transportSource.setSource(newSource.get(), 0, nullptr, reader->sampleRate);                                
+			playButton.setEnabled(true);                                                                               
+			readerSource.reset(newSource.release());                                                                   
+		}
+	}
+}
+
+
+void MainContentComponent::playButtonClicked()
+{
+	changeState(Starting);
+}
+
+void MainContentComponent::stopButtonClicked()
+{
+	changeState(Stopping);
 }

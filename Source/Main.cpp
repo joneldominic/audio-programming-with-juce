@@ -1,5 +1,6 @@
 #include <JuceHeader.h>
 #include "MainWindow.h"
+#include "MainContentComponent.h"
 
 //==============================================================================
 class AudioProgrammingwithJUCEApplication  : public juce::JUCEApplication
@@ -15,7 +16,7 @@ public:
 	//==============================================================================
 	void initialise (const juce::String& commandLine) override
 	{
-		mainWindow.reset(new MainWindow(getApplicationName()));
+		mainWindow.reset(new MainWindow(getApplicationName(), new MainContentComponent()));
 	}
 
 	void shutdown() override
