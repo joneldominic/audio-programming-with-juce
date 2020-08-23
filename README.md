@@ -1,2 +1,3 @@
-# audio-programming-with-juce
-My journey towards audio programming using JUCE Framework
+# Audio Programming with JUCE Framework
+
+![UI Sample](https://github.com/joneldominic/audio-programming-with-juce/blob/master/Resources/ui-sample.png?raw=true)
