@@ -12,7 +12,8 @@
 
 MainWindow::MainWindow(juce::String name, juce::Component* component) : DocumentWindow(
 	name,
-	juce::Colours::lightgrey,
+	juce::Desktop::getInstance().getDefaultLookAndFeel()
+								.findColour(ResizableWindow::backgroundColourId),
 	DocumentWindow::minimiseButton | DocumentWindow::closeButton)
 {
 	setUsingNativeTitleBar(true);
