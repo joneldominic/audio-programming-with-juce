@@ -6,6 +6,8 @@
   <MAINGROUP id="VUsdwM" name="Audio Programming with JUCE">
     <GROUP id="{23EFDE53-2992-5D4E-9B5D-D590ADE902AE}" name="Source">
       <FILE id="n5oUw2" name="Main.cpp" compile="1" resource="0" file="Source/Main.cpp"/>
+      <FILE id="ftGqrz" name="MainWindow.cpp" compile="1" resource="0" file="Source/MainWindow.cpp"/>
+      <FILE id="Ou8vwM" name="MainWindow.h" compile="0" resource="0" file="Source/MainWindow.h"/>
     </GROUP>
   </MAINGROUP>
   <JUCEOPTIONS JUCE_STRICT_REFCOUNTEDPOINTER="1"/>
