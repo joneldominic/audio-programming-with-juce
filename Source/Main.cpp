@@ -20,21 +20,43 @@ public:
 	bool moreThanOneInstanceAllowed() override             { return true; }
 
 	//==============================================================================
+	class MainWindow : public juce::DocumentWindow
+	{
+	public:
+		MainWindow(juce::String name) : DocumentWindow(
+			name,
+			juce::Colours::lightgrey,
+			DocumentWindow::minimiseButton | DocumentWindow::closeButton)
+		{
+			setUsingNativeTitleBar(true);
+			setResizable(false, false);
+			centreWithSize(500, 500);
+			setVisible(true);
+		}
+
+		void closeButtonPressed() override
+		{
+			juce::JUCEApplication::getInstance()->systemRequestedQuit();
+		}
+
+	private:
+		JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(MainWindow);
+	};
+
+	//==============================================================================
 	void initialise (const juce::String& commandLine) override
 	{
-		// Add your application's initialisation code here..
+		mainWindow.reset(new MainWindow(getApplicationName()));
 	}
 
 	void shutdown() override
 	{
-		// Add your application's shutdown code here..
+		mainWindow = nullptr;
 	}
 
 	//==============================================================================
 	void systemRequestedQuit() override
 	{
-		// This is called when the app is being asked to quit: you can ignore this
-		// request and let the app carry on running, or call quit() to allow the app to close.
 		quit();
 	}
 
@@ -44,6 +66,9 @@ public:
 		// this method is invoked, and the commandLine parameter tells you what
 		// the other instance's command-line arguments were.
 	}
+
+private:
+	std::unique_ptr<MainWindow> mainWindow;
 };
 
 //==============================================================================
